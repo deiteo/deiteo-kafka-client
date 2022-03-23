@@ -1,0 +1,31 @@
+name: 'Lint, Test & Build Image, Trivy Scan'
+description: 'Github action to Lint, Test & Build Image'
+inputs:
+  app:
+    required: true
+  tag:
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Build image
+      run: make build-container-image APP=${{ inputs.app }} TAG=${{ inputs.tag }}
+      shell: sh
+
+    - name: Run linter
+      run: make run-container-linter APP=${{ inputs.app }} TAG=${{ inputs.tag }}
+      shell: sh
+
+    - name: Unit tests and coverage
+      run: make run-container-tests APP=${{ inputs.app }} TAG=${{ inputs.tag }} type=unit
+      shell: sh
+
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: '${{ inputs.app }}:${{ inputs.tag }}'
+        format: 'table'
+        exit-code: '1'
+        ignore-unfixed: true
+        vuln-type: 'os,library'
+        severity: 'CRITICAL,HIGH'

@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "deiteo-kafka-client"
+version = "0.0.1"
+description = "Python Kafka CLient Developed By Deiteo Organisation"
+authors = ["Simon Thelin"]
+
+packages = [
+    { include = "**/*.*", from="src"}
+]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+aiokafka = "0.7.1"
+pre-commit = "^2.13.1"
+
+[tool.poetry.dev-dependencies]
+pytest = "^6.2.4"
+ipdb = "^0.13.9"
+pytest-cov = "^2.12.1"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
