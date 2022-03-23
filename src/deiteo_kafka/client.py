@@ -2,7 +2,7 @@ import asyncio
 import logging
 from asyncio import AbstractEventLoop
 from datetime import datetime
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 from aiokafka import AIOKafkaProducer
 from aiokafka.errors import (
@@ -34,6 +34,7 @@ class Client:
         log_level: str = "INFO",
         log_format: str = "%(asctime)s %(levelname)-8s %(message)s",
         date_fmt: str = "%Y-%m-%d %H:%M:%S",
+        loop: Optional[AbstractEventLoop] = None,
     ) -> None:
         log = Log(log_format=log_format, date_fmt=date_fmt, log_level=log_level)
         log.set_log_level()
@@ -41,17 +42,18 @@ class Client:
         self.bootstrap_servers = bootstrap_servers
         self.debug_mode = debug_mode
         self.log_level = log_level
-        loop: AbstractEventLoop = asyncio.get_event_loop()
+        self.loop = asyncio.get_event_loop() if not loop else loop
         self.producer = AIOKafkaProducer(
-            loop=loop,
+            loop=self.loop,
             bootstrap_servers=self.bootstrap_servers,
         )
 
-    async def _produce(self, topic_content: Dict[str, Dict[str, Any]]) -> None:
+    async def _send_and_wait(self, topic_content: Dict[str, Dict[str, Any]]) -> None:
         try:
             logging.debug(
-                f"Call aio-kafka produce send: {topic_content} \nand wait, ts: {datetime.utcnow()}"
-                f"\ntopic_content: {topic_content}"
+                f"Call aio-kafka produce send and wait: {topic_content} \n"
+                f"and wait, ts: {datetime.utcnow()}\n"
+                f"Topic Content: {topic_content}"
             )
 
             if not self.debug_mode:
@@ -75,7 +77,7 @@ class Client:
     ) -> None:
         try:
             await self.producer.start()
-            await self._produce(topic_content=topic_content)
+            await self._send_and_wait(topic_content=topic_content)
 
         except KafkaClientError as kafka_client_error:
             logging.error(f"Something went wrong! {kafka_client_error}")

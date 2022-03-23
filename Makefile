@@ -1,7 +1,7 @@
 export APP := deiteo/kafka-client
 export TAG := 0.0.1
 
-setup-environment: clean-environment install-environment install-linter
+setup-environment: install-environment install-linter clean-environment
 
 .PHONY: clean-environment
 clean-environment:
@@ -38,3 +38,19 @@ install-linter:
 .PHONY: linter
 linter:
 	poetry run pre-commit run --all-files
+
+.PHONY: run-container-linter
+run-container-linter:
+	docker run $(APP):$(TAG) make --directory app/ linter
+
+.PHONY: build-container-image
+build-container-image:
+	docker build -t $(APP):$(TAG) -f tools/docker/Dockerfile .
+
+.PHONY: get-container-info-environment
+get-container-info-environment:
+	docker run $(APP):$(TAG) make --directory app/ info-environment
+
+.PHONY: run-container-tests
+run-container-tests:
+	docker run $(APP):$(TAG) make --directory app/ test type=$(type)

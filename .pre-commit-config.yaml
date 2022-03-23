@@ -17,3 +17,7 @@ repos:
     rev: v5.10.1
     hooks:
     -   id: isort
+  - repo: https://github.com/petalmd/dockerfile-pre-commit
+    rev: v1.0
+    hooks:
+    - id: dockerlint
