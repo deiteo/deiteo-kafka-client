@@ -1,9 +1,9 @@
 [tool.poetry]
 name = "deiteo-kafka-client"
 version = "0.0.1"
-description = "Python Kafka CLient Developed By Deiteo Organisation"
+description = "Python Kafka Client Developed By Deiteo Organisation"
 authors = ["Simon Thelin"]
-
+readme = "README.md"
 packages = [
     { include = "**/*.*", from="src"}
 ]
