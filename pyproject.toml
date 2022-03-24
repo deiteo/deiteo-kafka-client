@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "deiteo-kafka-client"
-version = "0.0.4"
+version = "0.0.5"
 description = "Python Kafka Client Developed By Deiteo Organisation"
 authors = ["Simon Thelin"]
 readme = "README.md"

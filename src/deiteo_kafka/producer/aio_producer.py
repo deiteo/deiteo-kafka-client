@@ -1,4 +1,3 @@
-import asyncio
 import logging
 from asyncio import AbstractEventLoop
 from datetime import datetime
@@ -12,20 +11,22 @@ from aiokafka.errors import (
     ProducerClosed,
     UnsupportedVersionError,
 )
-from log import Log
+from deiteo_kafka.log import Log
+from deiteo_kafka.utils import DeiteoUtils
 
 
-class KafkaClientError(
+class AioProducerError(
     MessageSizeTooLargeError,
     UnsupportedVersionError,
     BrokerResponseError,
     KafkaConnectionError,
     ProducerClosed,
+    RuntimeError,
 ):
     pass
 
 
-class Client:
+class AioProducer:
     def __init__(
         self,
         topic: str,
@@ -35,18 +36,40 @@ class Client:
         log_format: str = "%(asctime)s %(levelname)-8s %(message)s",
         date_fmt: str = "%Y-%m-%d %H:%M:%S",
         loop: Optional[AbstractEventLoop] = None,
+        utils: Optional[DeiteoUtils] = None,
     ) -> None:
-        log = Log(log_format=log_format, date_fmt=date_fmt, log_level=log_level)
-        log.set_log_level()
         self.topic = topic
         self.bootstrap_servers = bootstrap_servers
         self.debug_mode = debug_mode
         self.log_level = log_level
-        self.loop = asyncio.get_event_loop() if not loop else loop
+        self.log_format = log_format
+        self.date_fmt = date_fmt
+        self.utils = DeiteoUtils() if not utils else utils
+
+        if not loop and self.utils:
+            self.loop = self.utils.get_running_loop()
+        else:
+            self.loop = loop
+
         self.producer = AIOKafkaProducer(
             loop=self.loop,
             bootstrap_servers=self.bootstrap_servers,
         )
+
+    def _setup_log(self) -> None:
+        log = Log(
+            log_format=self.log_format,
+            date_fmt=self.date_fmt,
+            log_level=self.log_level,
+        )
+        log.set_log_level()
+
+    async def _stop_producer(self) -> None:
+        try:
+            await self.producer.stop()
+
+        except RuntimeError as run_time_error:
+            raise run_time_error
 
     async def _send_and_wait(self, topic_content: Dict[str, Dict[str, Any]]) -> None:
         try:
@@ -79,5 +102,15 @@ class Client:
             await self.producer.start()
             await self._send_and_wait(topic_content=topic_content)
 
-        except KafkaClientError as kafka_client_error:
-            logging.error(f"Something went wrong! {kafka_client_error}")
+        except AioProducerError as aio_producer_error:
+            logging.error(f"Something went wrong! {aio_producer_error}")
+
+    async def stop_producer(self, stop_loop: bool = False) -> None:
+        try:
+            await self._stop_producer()
+
+            if stop_loop:
+                self.loop.stop()
+
+        except AioProducerError as aio_producer_error:
+            raise aio_producer_error
