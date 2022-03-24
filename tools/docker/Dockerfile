@@ -3,7 +3,7 @@ FROM python:3.8-slim-bullseye
 COPY src /app/src/
 COPY tests /app/tests/
 COPY .git /app/.git/
-COPY [".isort.cfg", ".pre-commit-config.yaml", "Makefile", "poetry.lock", "pyproject.toml", "/app/"]
+COPY [".isort.cfg", ".pre-commit-config.yaml", "Makefile", "poetry.lock", "pyproject.toml", "README.md", "/app/"]
 
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PIP_VERSION 22.0.4
