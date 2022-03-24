@@ -1,5 +1,5 @@
 export APP := deiteo/kafka-client
-export TAG := 0.0.3
+export TAG := 0.0.4
 
 setup-environment: install-environment install-linter clean-environment
 
