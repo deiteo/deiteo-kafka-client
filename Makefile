@@ -1,7 +1,7 @@
 export APP := deiteo/kafka-client
 export TAG := 0.0.4
 
-setup-environment: install-environment install-linter clean-environment
+setup-environment: install-environment install-linter install-wily clean-environment
 
 .PHONY: clean-environment
 clean-environment:
@@ -38,6 +38,8 @@ install-linter:
 .PHONY: linter
 linter:
 	poetry run pre-commit run --all-files
+	poetry run wily rank src/
+	poetry run wily rank tests/
 
 .PHONY: run-container-linter
 run-container-linter:
@@ -54,3 +56,8 @@ get-container-info-environment:
 .PHONY: run-container-tests
 run-container-tests:
 	docker run $(APP):$(TAG) make --directory app/ test type=$(type)
+
+.PHONY: install-wily
+install-wily:
+	poetry run wily build src/ tests/
+
