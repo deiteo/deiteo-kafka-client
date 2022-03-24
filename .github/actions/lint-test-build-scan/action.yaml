@@ -1,4 +1,4 @@
-name: 'Lint, Test & Build Image, Trivy Scan'
+name: 'Lint Dockerfile, Build Image, Test & Trivy Scan'
 description: 'Github action to Lint, Test & Build Image'
 inputs:
   app:
@@ -8,6 +8,11 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - name: Lint Dockerfile
+      uses: hadolint/hadolint-action@master
+      with:
+        dockerfile: "tools/docker/Dockerfile"
+
     - name: Build image
       run: make build-container-image APP=${{ inputs.app }} TAG=${{ inputs.tag }}
       shell: sh
