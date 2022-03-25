@@ -24,7 +24,7 @@ deiteo_kafka_aio_producer = DeiteoKafkaAioProducer(
     bootstrap_servers=bootstrap_servers,
     topic=topic,
 )
-await deiteo_kafka_aio_producer.start()
+await deiteo_kafka_aio_producer.producer.start()
 await deiteo_kafka_aio_producer.produce(topic_content=topic_content)
 ```
 
@@ -43,14 +43,14 @@ deiteo_kafka_aio_producer = DeiteoKafkaAioProducer(
     topic=topic,
     loop=loop,
 )
-await deiteo_kafka_aio_producer.start()
+await deiteo_kafka_aio_producer.producer.start()
 await deiteo_kafka_aio_producer.produce(topic_content=topic_content)
 ```
 
 You can then stop the producer if needed by:
 
 ```python
-await deiteo_kafka_aio_producer.stop()
+await deiteo_kafka_aio_producer.producer.stop()
 ```
 
 ## Setup From Scratch

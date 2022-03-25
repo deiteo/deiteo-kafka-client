@@ -12,7 +12,6 @@ from aiokafka.errors import (
     UnsupportedVersionError,
 )
 from deiteo_kafka.log import Log
-from deiteo_kafka.utils import DeiteoUtils
 
 
 class DeiteoKafkaAioProducer:
