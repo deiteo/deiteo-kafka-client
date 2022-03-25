@@ -9,24 +9,26 @@ from aiokafka.errors import (
     KafkaConnectionError,
     MessageSizeTooLargeError,
     ProducerClosed,
+    UnrecognizedBrokerVersion,
     UnsupportedVersionError,
 )
 from deiteo_kafka.log import Log
 from deiteo_kafka.utils import DeiteoUtils
 
 
-class AioProducerError(
+class DeiteoKafkaAioProducerError(
     MessageSizeTooLargeError,
     UnsupportedVersionError,
     BrokerResponseError,
     KafkaConnectionError,
     ProducerClosed,
+    UnrecognizedBrokerVersion,
     RuntimeError,
 ):
     pass
 
 
-class AioProducer:
+class DeiteoKafkaAioProducer:
     def __init__(
         self,
         topic: str,
@@ -71,6 +73,13 @@ class AioProducer:
         except RuntimeError as run_time_error:
             raise run_time_error
 
+    async def _start_producer(self) -> None:
+        try:
+            await self.producer.start()
+
+        except UnrecognizedBrokerVersion as unrecognized_broker_version:
+            raise unrecognized_broker_version
+
     async def _send_and_wait(self, topic_content: Dict[str, Dict[str, Any]]) -> None:
         try:
             logging.debug(
@@ -99,10 +108,9 @@ class AioProducer:
         topic_content: Dict[str, Dict[str, Any]],
     ) -> None:
         try:
-            await self.producer.start()
             await self._send_and_wait(topic_content=topic_content)
 
-        except AioProducerError as aio_producer_error:
+        except DeiteoKafkaAioProducerError as aio_producer_error:
             logging.error(f"Something went wrong! {aio_producer_error}")
 
     async def stop_producer(self, stop_loop: bool = False) -> None:
@@ -112,5 +120,12 @@ class AioProducer:
             if stop_loop:
                 self.loop.stop()
 
-        except AioProducerError as aio_producer_error:
-            raise aio_producer_error
+        except DeiteoKafkaAioProducerError as deiteo_kafka_aio_producer_error:
+            raise deiteo_kafka_aio_producer_error
+
+    async def start_producer(self) -> None:
+        try:
+            await self._start_producer()
+
+        except DeiteoKafkaAioProducerError as deiteo_kafka_aio_producer_error:
+            raise deiteo_kafka_aio_producer_error
