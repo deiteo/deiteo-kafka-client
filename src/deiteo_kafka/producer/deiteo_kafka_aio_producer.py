@@ -1,5 +1,5 @@
 import logging
-from asyncio import AbstractEventLoop
+from asyncio import AbstractEventLoop, get_event_loop
 from datetime import datetime
 from typing import Any, Dict, Optional
 
@@ -9,23 +9,10 @@ from aiokafka.errors import (
     KafkaConnectionError,
     MessageSizeTooLargeError,
     ProducerClosed,
-    UnrecognizedBrokerVersion,
     UnsupportedVersionError,
 )
 from deiteo_kafka.log import Log
 from deiteo_kafka.utils import DeiteoUtils
-
-
-class DeiteoKafkaAioProducerError(
-    MessageSizeTooLargeError,
-    UnsupportedVersionError,
-    BrokerResponseError,
-    KafkaConnectionError,
-    ProducerClosed,
-    UnrecognizedBrokerVersion,
-    RuntimeError,
-):
-    pass
 
 
 class DeiteoKafkaAioProducer:
@@ -38,61 +25,42 @@ class DeiteoKafkaAioProducer:
         log_format: str = "%(asctime)s %(levelname)-8s %(message)s",
         date_fmt: str = "%Y-%m-%d %H:%M:%S",
         loop: Optional[AbstractEventLoop] = None,
-        utils: Optional[DeiteoUtils] = None,
     ) -> None:
+        Log(
+            log_format=log_format,
+            date_fmt=date_fmt,
+            log_level=log_level,
+        ).set_log_level()
+
         self.topic = topic
         self.bootstrap_servers = bootstrap_servers
         self.debug_mode = debug_mode
-        self.log_level = log_level
-        self.log_format = log_format
-        self.date_fmt = date_fmt
-        self.utils = DeiteoUtils() if not utils else utils
-
-        if not loop and self.utils:
-            self.loop = self.utils.get_running_loop()
-        else:
-            self.loop = loop
-
+        self.loop = loop if loop else self._get_running_loop()
         self.producer = AIOKafkaProducer(
             loop=self.loop,
             bootstrap_servers=self.bootstrap_servers,
         )
 
-    def _setup_log(self) -> None:
-        log = Log(
-            log_format=self.log_format,
-            date_fmt=self.date_fmt,
-            log_level=self.log_level,
-        )
-        log.set_log_level()
+    @staticmethod
+    def _get_running_loop() -> AbstractEventLoop:
+        loop = get_event_loop()
 
-    async def _stop_producer(self) -> None:
-        try:
-            await self.producer.stop()
+        if not loop.is_running():
+            err_msg = "The loop should be created within an async function or provide directly"
+            raise RuntimeError(err_msg)
 
-        except RuntimeError as run_time_error:
-            raise run_time_error
-
-    async def _start_producer(self) -> None:
-        try:
-            await self.producer.start()
-
-        except UnrecognizedBrokerVersion as unrecognized_broker_version:
-            raise unrecognized_broker_version
+        return loop
 
     async def _send_and_wait(self, topic_content: Dict[str, Dict[str, Any]]) -> None:
         try:
-            logging.debug(
-                f"Call aio-kafka produce send and wait: {topic_content} \n"
-                f"and wait, ts: {datetime.utcnow()}\n"
-                f"Topic Content: {topic_content}"
-            )
+            logging.debug(f"Call aio-kafka produce send and wait %s", topic_content)
 
             if not self.debug_mode:
                 await self.producer.send_and_wait(
                     self.topic,
                     bytes(str(topic_content), "utf-8"),
                 )
+                logging.debug(f"Successfully produced to topic %s", self.topic)
 
         except (
             BrokerResponseError,
@@ -107,25 +75,4 @@ class DeiteoKafkaAioProducer:
         self,
         topic_content: Dict[str, Dict[str, Any]],
     ) -> None:
-        try:
-            await self._send_and_wait(topic_content=topic_content)
-
-        except DeiteoKafkaAioProducerError as aio_producer_error:
-            logging.error(f"Something went wrong! {aio_producer_error}")
-
-    async def stop_producer(self, stop_loop: bool = False) -> None:
-        try:
-            await self._stop_producer()
-
-            if stop_loop:
-                self.loop.stop()
-
-        except DeiteoKafkaAioProducerError as deiteo_kafka_aio_producer_error:
-            raise deiteo_kafka_aio_producer_error
-
-    async def start_producer(self) -> None:
-        try:
-            await self._start_producer()
-
-        except DeiteoKafkaAioProducerError as deiteo_kafka_aio_producer_error:
-            raise deiteo_kafka_aio_producer_error
+        await self._send_and_wait(topic_content=topic_content)

@@ -38,8 +38,6 @@ install-linter:
 .PHONY: linter
 linter:
 	poetry run pre-commit run --all-files
-	poetry run wily rank src/
-	poetry run wily rank tests/
 
 .PHONY: run-container-linter
 run-container-linter:

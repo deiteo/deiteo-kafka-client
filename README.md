@@ -24,7 +24,7 @@ deiteo_kafka_aio_producer = DeiteoKafkaAioProducer(
     bootstrap_servers=bootstrap_servers,
     topic=topic,
 )
-await deiteo_kafka_aio_producer.start_producer()
+await deiteo_kafka_aio_producer.start()
 await deiteo_kafka_aio_producer.produce(topic_content=topic_content)
 ```
 
@@ -43,25 +43,15 @@ deiteo_kafka_aio_producer = DeiteoKafkaAioProducer(
     topic=topic,
     loop=loop,
 )
-await deiteo_kafka_aio_producer.start_producer()
+await deiteo_kafka_aio_producer.start()
 await deiteo_kafka_aio_producer.produce(topic_content=topic_content)
 ```
 
 You can then stop the producer if needed by:
 
 ```python
-await deiteo_kafka_aio_producer.stop_producer()
+await deiteo_kafka_aio_producer.stop()
 ```
-
-This will not stop the event `loop`. If you also want to stop the event loop, simply provide key
-`stop_loop=True`.
-
-```python
-await deiteo_kafka_aio_producer.stop_producer(stop_loop=True)
-```
-
-The reason for this is that you might have a larger application, utilising this `loop`, and you
-only want to close the `DeiteoKafkaAioProducer`, but not the event loop itself.
 
 ## Setup From Scratch
 
