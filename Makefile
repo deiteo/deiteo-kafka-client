@@ -1,5 +1,5 @@
 export APP := deiteo/kafka-client
-export TAG := 0.0.4
+export TAG := 0.0.1-alpha.0
 
 setup-environment: install-environment setup-wily install-linter clean-environment
 
@@ -33,12 +33,19 @@ update-environment:
 .PHONY: setup-wily
 setup-wily:
 	poetry run wily clean --yes
-	poetry run wily build src/ tests/ src/deiteo_kafka/producer -n 100 -o cyclomatic,raw,maintainability,halstead
-
-.PHONY: wily-operators
-wily-operators:
+	poetry run wily build src/ tests/ -n 10 -o cyclomatic,raw,maintainability,halstead
 	poetry run wily index
-	poetry run wily rank --asc --threshold=80
+
+.PHONY: wily-operators-src
+wily-operators-src:
+	poetry run wily rank src/ --asc --threshold=80
+	poetry run wily report src/deiteo_kafka/log.py
+	poetry run wily report src/deiteo_kafka/producer/deiteo_kafka_aio_producer.py
+
+.PHONY: wily-operators-tests
+wily-operators-tests:
+	poetry run wily rank tests/ --asc --threshold=80
+	poetry run wily report
 	poetry run wily report src/deiteo_kafka/log.py
 	poetry run wily report src/deiteo_kafka/producer/deiteo_kafka_aio_producer.py
 
