@@ -45,9 +45,8 @@ wily-operators-src:
 .PHONY: wily-operators-tests
 wily-operators-tests:
 	poetry run wily rank tests/ --asc --threshold=80
-	poetry run wily report
-	poetry run wily report src/deiteo_kafka/log.py
-	poetry run wily report src/deiteo_kafka/producer/deiteo_kafka_aio_producer.py
+	poetry run wily report tests/conftest.py
+	poetry run wily report tests/unit/src/deiteo_kafka/producer/test_deiteo_kafka_aio_producer.py
 
 .PHONY: install-linter
 install-linter:

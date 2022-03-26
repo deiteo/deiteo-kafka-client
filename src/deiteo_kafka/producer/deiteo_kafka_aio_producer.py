@@ -19,7 +19,6 @@ class DeiteoKafkaAioProducer:
         self,
         topic: str,
         bootstrap_servers: str,
-        debug_mode: bool = False,
         log_level: str = "INFO",
         log_format: str = "%(asctime)s %(levelname)-8s %(message)s",
         date_fmt: str = "%Y-%m-%d %H:%M:%S",
@@ -33,7 +32,6 @@ class DeiteoKafkaAioProducer:
 
         self.topic = topic
         self.bootstrap_servers = bootstrap_servers
-        self.debug_mode = debug_mode
         self.loop = loop if loop else self._get_running_loop()
         self.producer = AIOKafkaProducer(
             loop=self.loop,
@@ -50,16 +48,26 @@ class DeiteoKafkaAioProducer:
 
         return loop
 
+    @staticmethod
+    def _add_ingestion_ts(topic_content: Dict[str, Any]) -> None:
+        topic_content["ingestion_utc_ts"] = datetime.utcnow().isoformat()
+
     async def _send_and_wait(self, topic_content: Dict[str, Dict[str, Any]]) -> None:
         try:
             logging.debug(f"Call aio-kafka produce send and wait %s", topic_content)
 
-            if not self.debug_mode:
-                await self.producer.send_and_wait(
-                    self.topic,
-                    bytes(str(topic_content), "utf-8"),
-                )
-                logging.debug(f"Successfully produced to topic %s", self.topic)
+            if isinstance(topic_content, dict):
+                self._add_ingestion_ts(topic_content=topic_content)
+
+            elif isinstance(topic_content, str):
+                topic_content = {"data": topic_content}
+                self._add_ingestion_ts(topic_content=topic_content)
+
+            await self.producer.send_and_wait(
+                self.topic,
+                bytes(str(topic_content), "utf-8"),
+            )
+            logging.debug(f"Successfully produced to topic %s", self.topic)
 
         except (
             BrokerResponseError,
