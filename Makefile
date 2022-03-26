@@ -35,12 +35,10 @@ setup-wily:
 	poetry run wily clean --yes
 	poetry run wily build -n 100 -o cyclomatic,raw,maintainability,halstead
 
-.PHONY: wily
-wily:
+.PHONY: wily-operators
+wily-operators:
 	poetry run wily index
 	poetry run wily rank --asc --threshold=50 | tee wily-rank.txt
-	poetry run wily graph src/ -c mi -o res-main.html
-	poetry run wily graph src/ -c complexity -o wily-complex-path.html
 
 .PHONY: install-linter
 install-linter:
