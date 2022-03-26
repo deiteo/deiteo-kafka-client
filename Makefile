@@ -38,7 +38,7 @@ setup-wily:
 .PHONY: wily
 wily:
 	poetry run wily index
-	poetry run wily rank --asc --threshold=50 wily-target/ | tee wily-target/
+	poetry run wily rank --asc --threshold=50 wily-rank | tee wily-rank
 	poetry run wily graph wily-target -c mi -o res-main.html
 	poetry run wily graph -c complexity -o wily-complex-path
 
