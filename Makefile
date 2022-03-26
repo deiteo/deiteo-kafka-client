@@ -33,7 +33,7 @@ update-environment:
 .PHONY: setup-wily
 setup-wily:
 	poetry run wily clean --yes
-	poetry run wily build -n 100 -o cyclomatic,raw,maintainability,halstead
+	poetry run wily build src/ tests/ -n 100 -o cyclomatic,raw,maintainability,halstead
 
 .PHONY: wily-operators
 wily-operators:
