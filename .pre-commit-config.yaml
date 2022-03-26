@@ -21,11 +21,3 @@ repos:
     rev: v2.9.3
     hooks:
       - id: hadolint-docker
-  - repo: local
-    hooks:
-    -   id: wily
-        name: wily
-        entry: wily diff
-        verbose: true
-        language: python
-        additional_dependencies: [wily]
