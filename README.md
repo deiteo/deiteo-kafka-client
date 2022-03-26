@@ -1,5 +1,8 @@
 # Deiteo Kafka Client
 
+![example workflow](https://github.com/deiteo/deiteo-kafka-client/actions/workflows/merge.yaml/badge.svg)
+![example workflow](https://github.com/deiteo/deiteo-kafka-client/actions/workflows/pr.yaml/badge.svg)
+
 A library creating an interface on top of `AIOKafkaProducer`. To handle specific needs of
 projects within open source Deiteo organisation.
 
