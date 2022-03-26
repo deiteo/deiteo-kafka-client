@@ -3,7 +3,8 @@ import os
 from typing import Generator
 from unittest.mock import MagicMock, patch
 
-import pytest
+import pytest_asyncio
+from aiokafka import AIOKafkaProducer
 
 from src.deiteo_kafka.producer.deiteo_kafka_aio_producer import DeiteoKafkaAioProducer
 
@@ -14,15 +15,17 @@ FAKE_BOOTSTRAP_SERVERS = "localhost-fake:1234"
 DEITEO_KAFKA_AIO_PRODUCER_PATH = "src.deiteo_kafka.producer.deiteo_kafka_aio_producer"
 
 
-@pytest.fixture(scope="function")
+@pytest_asyncio.fixture(scope="function")
 def mock_aio_kafka_producer() -> Generator[MagicMock, None, None]:
-    with patch(f"{DEITEO_KAFKA_AIO_PRODUCER_PATH}.AIOKafkaProducer") as mocked_aio_kafka_producer:
+    with patch(
+        f"{DEITEO_KAFKA_AIO_PRODUCER_PATH}.AIOKafkaProducer", spec_set=AIOKafkaProducer
+    ) as mocked_aio_kafka_producer:
         yield mocked_aio_kafka_producer
 
     mocked_aio_kafka_producer.reset_mock()
 
 
-@pytest.fixture(scope="function")
+@pytest_asyncio.fixture(scope="function")
 def deiteo_kafka_aio_instance(
     event_loop, mock_aio_kafka_producer
 ) -> Generator[DeiteoKafkaAioProducer, None, None]:

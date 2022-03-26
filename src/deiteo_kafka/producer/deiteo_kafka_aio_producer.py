@@ -1,7 +1,7 @@
 import logging
 from asyncio import AbstractEventLoop, get_event_loop
 from datetime import datetime
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Union
 
 from aiokafka import AIOKafkaProducer
 from aiokafka.errors import (
@@ -52,7 +52,7 @@ class DeiteoKafkaAioProducer:
     def _add_ingestion_ts(topic_content: Dict[str, Any]) -> None:
         topic_content["ingestion_utc_ts"] = datetime.utcnow().isoformat()
 
-    async def _send_and_wait(self, topic_content: Dict[str, Dict[str, Any]]) -> None:
+    async def _send_and_wait(self, topic_content: Union[str, Dict[str, Any]]) -> None:
         try:
             logging.debug(f"Call aio-kafka produce send and wait %s", topic_content)
 
@@ -80,6 +80,6 @@ class DeiteoKafkaAioProducer:
 
     async def produce(
         self,
-        topic_content: Dict[str, Dict[str, Any]],
+        topic_content: Union[str, Dict[str, Any]],
     ) -> None:
         await self._send_and_wait(topic_content=topic_content)
