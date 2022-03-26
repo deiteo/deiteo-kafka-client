@@ -1,7 +1,7 @@
 export APP := deiteo/kafka-client
 export TAG := 0.0.1-alpha.0
 
-setup-environment: install-environment setup-wily install-linter clean-environment
+setup-environment: install-environment install-linter clean-environment
 
 .PHONY: clean-environment
 clean-environment:
