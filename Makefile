@@ -38,7 +38,9 @@ setup-wily:
 .PHONY: wily-operators
 wily-operators:
 	poetry run wily index
-	poetry run wily rank --asc --threshold=50 | tee wily-rank.txt
+	poetry run wily rank --asc --threshold=80
+	poetry run wily report src/deiteo_kafka/log.py
+	poetry run wily report src/deiteo_kafka/producer/deiteo_kafka_aio_producer.py
 
 .PHONY: install-linter
 install-linter:
