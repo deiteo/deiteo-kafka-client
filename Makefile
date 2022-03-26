@@ -33,14 +33,14 @@ update-environment:
 .PHONY: setup-wily
 setup-wily:
 	poetry run wily clean --yes
-	poetry run wily build -n 10 -o cyclomatic,raw,maintainability,halstead
+	poetry run wily build -n 100 -o cyclomatic,raw,maintainability,halstead
 
 .PHONY: wily
 wily:
 	poetry run wily index
-	poetry run wily rank --asc --threshold=50 wily-rank.txt | tee wily-rank.txt
-	poetry run wily graph wily-target.txt -c mi -o res-main.html
-	poetry run wily graph -c complexity -o wily-complex-path
+	poetry run wily rank --asc --threshold=50 | tee wily-rank.txt
+	poetry run wily graph src/ -c mi -o res-main.html
+	poetry run wily graph src/ -c complexity -o wily-complex-path.html
 
 .PHONY: install-linter
 install-linter:
