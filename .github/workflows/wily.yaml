@@ -1,4 +1,4 @@
-name: Example Wily Pipeline on PR
+name: Wily Pipeline
 
 on:
   pull_request:
@@ -11,7 +11,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
         with:
-          fetch-depth: 0
+          fetch-depth: 5
           ref: ${{ github.event.pull_request.head.ref }}
 
       - name: Set up Python
