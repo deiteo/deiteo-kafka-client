@@ -25,7 +25,7 @@ jobs:
       - name: Build cache and diff
         id: wily
         run: |
-          wily build src/ tests/ -n 5
+          wily build src/ tests/
           DIFF=$(wily diff src/ tests/ --no-detail -r origin/${{ github.event.pull_request.base.ref }})
           RANK_SRC=$(wily rank src/ --asc --threshold=80)
           RANK_TESTS=$(wily rank tests/ --asc --threshold=80)
