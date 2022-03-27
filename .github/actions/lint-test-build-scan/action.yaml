@@ -23,8 +23,9 @@ runs:
 
     - name: Unit Tests & Coverage
       id: UnitTestsAndCoverage
-      run: echo "::set-output name=testOutput::$(make run-container-tests APP=${{ inputs.app }} TAG=${{ inputs.tag }} type=unit)"
       shell: sh
+      run: |
+        echo "::set-output name=testOutput::$(make run-container-tests APP=${{ inputs.app }} TAG=${{ inputs.tag }} type=unit)"
 
     - name: Unit Tests & Coverage Message
       uses: marocchino/sticky-pull-request-comment@v2
@@ -33,7 +34,7 @@ runs:
         number: ${{ steps.UnitTestsAndCoverage.outputs.number }}
         message: |
           ```
-          ${{ steps.UnitTestsAndCoverage.outputs.testOutput }}
+          ${{ steps.UnitTestsAndCoverage.outputs.testOutput.stdout }}
           ```
 
     - name: Run Trivy vulnerability scanner
