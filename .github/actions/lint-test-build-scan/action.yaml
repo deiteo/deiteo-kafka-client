@@ -22,8 +22,19 @@ runs:
       shell: sh
 
     - name: Unit tests and coverage
+      id: UnitTestsAndCoverage
       run: make run-container-tests APP=${{ inputs.app }} TAG=${{ inputs.tag }} type=unit
       shell: sh
+
+    - name: Unit tests and coverage Message
+      uses: marocchino/sticky-pull-request-comment@v2
+      with:
+        recreate: true
+        number: ${{ steps.UnitTestsAndCoverage.outputs.number }}
+        message: |
+          ```
+          ${{ steps.trivyScan.UnitTestsAndCoverage.stdout }}
+          ```
 
     - name: Run Trivy vulnerability scanner
       uses: aquasecurity/trivy-action@master
@@ -36,12 +47,12 @@ runs:
         vuln-type: 'os,library'
         severity: 'CRITICAL,HIGH'
 
-    - name: Trivy Scan Result
+    - name: Trivy Scan Result Message
       uses: marocchino/sticky-pull-request-comment@v2
       with:
         recreate: true
         number: ${{ steps.trivyScan.outputs.number }}
         message: |
           ```
-          ${{ steps.trivyScan.outputs.diff }}
+          ${{ steps.trivyScan.outputs.stdout }}
           ```
