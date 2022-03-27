@@ -27,8 +27,8 @@ jobs:
         run: |
           wily build src/ tests/
           DIFF=$(wily diff src/ tests/ --no-detail -r origin/${{ github.event.pull_request.base.ref }})
-          RANK_SRC=$(wily report src/)
-          RANK_TESTS=$(wily report tests/)
+          RANK_SRC=$(wily rank src/ --asc)
+          RANK_TESTS=$(wily rank tests/ --asc)
 
           echo "$DIFF"
           echo "$RANK_SRC"
