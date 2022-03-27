@@ -38,6 +38,15 @@ jobs:
           DIFF="${DIFF//'%'/'%25'}"
           DIFF="${DIFF//$'\n'/'%0A'}"
           DIFF="${DIFF//$'\r'/'%0D'}"
+
+          RANK_SRC="${RANK_SRC//'%'/'%25'}"
+          RANK_SRC="${RANK_SRC//$'\n'/'%0A'}"
+          RANK_SRC="${RANK_SRC//$'\r'/'%0D'}"
+
+          RANK_TESTS="${RANK_TESTS//'%'/'%25'}"
+          RANK_TESTS="${RANK_TESTS//$'\n'/'%0A'}"
+          RANK_TESTS="${RANK_TESTS//$'\r'/'%0D'}"
+
           echo "::set-output name=diff::$DIFF"
           echo "::set-output name=rank_src::$RANK_SRC"
           echo "::set-output name=rank_tests::$RANK_TESTS"
