@@ -64,18 +64,9 @@ jobs:
           message: |
             ```
             ${{ steps.wily.outputs.diff }}
-            ```
-      - name: Add Wily Rank src/ PR Comment
-        uses: marocchino/sticky-pull-request-comment@v2
-        if: steps.findPr.outputs.number && steps.wily.outputs.rank_src != ''
-        with:
-          recreate: true
-          number: ${{ steps.findPr.outputs.number }}
-          message: |
-            ```
             ${{ steps.wily.outputs.rank_src }}
+            ${{ steps.wily.outputs.rank_tests }}
             ```
-
       - name: Add Wily PR Comment
         uses: marocchino/sticky-pull-request-comment@v2
         if: steps.findPr.outputs.number && steps.wily.outputs.diff == ''
