@@ -14,23 +14,15 @@ runs:
       with:
         dockerfile: "tools/docker/Dockerfile"
 
-    - name: Lint Dockerfile Message
-      uses: marocchino/sticky-pull-request-comment@v2
-      with:
-        recreate: true
-        number: ${{ steps.LintDockerfile.number }}
-        message: |
-          ```
-          ${{ steps.LintDockerfile.outputs.stdout }}
-          ```
-
     - name: Build image
       run: make build-container-image APP=${{ inputs.app }} TAG=${{ inputs.tag }}
       shell: sh
 
     - name: Run linter
       id: RunLinter
-      run: make run-container-linter APP=${{ inputs.app }} TAG=${{ inputs.tag }}
+      run: |
+        LINTER_OUTPUT="$(make run-container-linter APP=${{ inputs.app }} TAG=${{ inputs.tag }})"
+        echo "::set-output name=linter_output::$LINTER_OUTPUT"
       shell: sh
 
     - name: Run linter Message
@@ -40,7 +32,7 @@ runs:
         number: ${{ steps.RunLinter.number }}
         message: |
           ```
-          ${{ steps.RunLinter.outputs.stdout }}
+          ${{ steps.RunLinter.outputs.linter_output }}
           ```
 
     - name: Unit Tests & Coverage
@@ -48,16 +40,6 @@ runs:
       shell: sh
       run: |
         make run-container-tests APP=${{ inputs.app }} TAG=${{ inputs.tag }} type=unit
-
-    - name: Unit Tests & Coverage Message
-      uses: marocchino/sticky-pull-request-comment@v2
-      with:
-        recreate: true
-        number: ${{ steps.UnitTestsAndCoverage.number }}
-        message: |
-          ```
-          ${{ steps.UnitTestsAndCoverage.outputs.stdout }}
-          ```
 
     - name: Run Trivy vulnerability scanner
       uses: aquasecurity/trivy-action@master
@@ -69,13 +51,3 @@ runs:
         ignore-unfixed: true
         vuln-type: 'os,library'
         severity: 'CRITICAL,HIGH'
-
-    - name: Unit Tests & Coverage Message
-      uses: marocchino/sticky-pull-request-comment@v2
-      with:
-        recreate: true
-        number: ${{ steps.trivyScan.number }}
-        message: |
-          ```
-          ${{ steps.trivyScan.outputs.stdout }}
-          ```
