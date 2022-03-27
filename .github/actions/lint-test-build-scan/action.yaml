@@ -27,6 +27,7 @@ runs:
 
     - name: Run Trivy vulnerability scanner
       uses: aquasecurity/trivy-action@master
+      id: trivyScan
       with:
         image-ref: '${{ inputs.app }}:${{ inputs.tag }}'
         format: 'table'
@@ -34,3 +35,14 @@ runs:
         ignore-unfixed: true
         vuln-type: 'os,library'
         severity: 'CRITICAL,HIGH'
+
+    - name: Trivy Scan Result
+      uses: marocchino/sticky-pull-request-comment@v2
+      if: steps.findPr.outputs.number && steps.wily.outputs.diff == ''
+      with:
+        recreate: true
+        number: ${{ steps.trivyScan.outputs.number }}
+        message: |
+          ```
+          ${{ steps.trivyScan.outputs.diff }}
+          ```

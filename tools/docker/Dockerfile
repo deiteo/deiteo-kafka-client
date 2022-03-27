@@ -11,6 +11,8 @@ ENV POETRY_VERSION 1.1.13
 ENV HADOLINT_VERSION 1.18.0
 
 RUN apt-get update && \
+    apt-get -y install --no-install-recommends libc-bin=2.31-13+deb11u3 && \
+    apt-get -y install --no-install-recommends libc6=2.31-13+deb11u3 && \
     apt-get -y install --no-install-recommends git=1:2.30.2-1 && \
     apt-get -y install --no-install-recommends make=4.3-4.1 && \
     apt-get -y install --no-install-recommends wget=1.21-1+deb11u1 && \
