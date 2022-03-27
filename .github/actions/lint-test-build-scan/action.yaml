@@ -20,20 +20,8 @@ runs:
 
     - name: Run linter
       id: RunLinter
-      run: |
-        LINTER_OUTPUT="$(make run-container-linter APP=${{ inputs.app }} TAG=${{ inputs.tag }})"
-        echo "::set-output name=linter::$LINTER_OUTPUT"
+      run: make run-container-linter APP=${{ inputs.app }} TAG=${{ inputs.tag }}
       shell: sh
-
-    - name: Run linter Message
-      uses: marocchino/sticky-pull-request-comment@v2
-      with:
-        recreate: true
-        number: ${{ steps.findPr.number }}
-        message: |
-          ```
-          ${{ steps.RunLinter.outputs.linter }}
-          ```
 
     - name: Unit Tests & Coverage
       id: UnitTestsAndCoverage
