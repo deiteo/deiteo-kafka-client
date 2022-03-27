@@ -8,10 +8,6 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Find current PR
-      uses: jwalton/gh-find-current-pr@v1
-      id: findPr
-
     - name: Lint Dockerfile
       id: LintDockerfile
       uses: hadolint/hadolint-action@master
