@@ -27,3 +27,13 @@ jobs:
         with:
           app: ${{ steps.vars.outputs.app }}
           tag: ${{ steps.vars.outputs.tag }}
+
+      - name: Run linter Message
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          recreate: true
+          number: ${{ steps.RunLinter.number }}
+          message: |
+            ```
+            ${{ steps.RunLinter.outputs.linter }}
+            ```
