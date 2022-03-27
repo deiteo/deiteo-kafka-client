@@ -21,19 +21,19 @@ runs:
       run: make run-container-linter APP=${{ inputs.app }} TAG=${{ inputs.tag }}
       shell: sh
 
-    - name: Unit tests and coverage
+    - name: Unit Tests & Coverage
       id: UnitTestsAndCoverage
-      run: make run-container-tests APP=${{ inputs.app }} TAG=${{ inputs.tag }} type=unit
+      run: echo "::set-output name=testOutput::$(make run-container-tests APP=${{ inputs.app }} TAG=${{ inputs.tag }} type=unit)"
       shell: sh
 
-    - name: Unit tests and coverage Message
+    - name: Unit Tests & Coverage Message
       uses: marocchino/sticky-pull-request-comment@v2
       with:
         recreate: true
-        number: ${{ steps.UnitTestsAndCoverage.outputs.number }}
+        number: ${{ steps.UnitTestsAndCoverage.outputs.* }}
         message: |
           ```
-          ${{ steps.trivyScan.UnitTestsAndCoverage.stdout }}
+          ${{ steps.UnitTestsAndCoverage.outputs.* }}
           ```
 
     - name: Run Trivy vulnerability scanner
@@ -46,13 +46,3 @@ runs:
         ignore-unfixed: true
         vuln-type: 'os,library'
         severity: 'CRITICAL,HIGH'
-
-    - name: Trivy Scan Result Message
-      uses: marocchino/sticky-pull-request-comment@v2
-      with:
-        recreate: true
-        number: ${{ steps.trivyScan.outputs.number }}
-        message: |
-          ```
-          ${{ steps.trivyScan.outputs.stdout }}
-          ```
