@@ -27,29 +27,29 @@ jobs:
         run: |
           wily build src/ tests/
           DIFF=$(wily diff src/ tests/ --no-detail -r origin/${{ github.event.pull_request.base.ref }})
-          RANK_SRC=$(wily rank src/ --asc)
-          RANK_TESTS=$(wily rank tests/ --asc)
+          RANK_LOG=$(wily report src/deiteo_kafka/log.py -n 5)
+          RANK_PRODUCER=$(wily report src/deiteo_kafka/log.py -n 5)
 
           echo "$DIFF"
-          echo "$RANK_SRC"
-          echo "$RANK_TESTS"
+          echo "RANK_LOG"
+          echo "RANK_PRODUCER"
 
           # Build multine output
           DIFF="${DIFF//'%'/'%25'}"
           DIFF="${DIFF//$'\n'/'%0A'}"
           DIFF="${DIFF//$'\r'/'%0D'}"
 
-          RANK_SRC="${RANK_SRC//'%'/'%25'}"
-          RANK_SRC="${RANK_SRC//$'\n'/'%0A'}"
-          RANK_SRC="${RANK_SRC//$'\r'/'%0D'}"
+          RANK_LOG="${RANK_LOG//'%'/'%25'}"
+          RANK_LOG="${RANK_LOG//$'\n'/'%0A'}"
+          RANK_LOG="${RANK_LOG//$'\r'/'%0D'}"
 
-          RANK_TESTS="${RANK_TESTS//'%'/'%25'}"
-          RANK_TESTS="${RANK_TESTS//$'\n'/'%0A'}"
-          RANK_TESTS="${RANK_TESTS//$'\r'/'%0D'}"
+          RANK_PRODUCER="${RANK_PRODUCER//'%'/'%25'}"
+          RANK_PRODUCER="${RANK_PRODUCER//$'\n'/'%0A'}"
+          RANK_PRODUCER="${RANK_PRODUCER//$'\r'/'%0D'}"
 
           echo "::set-output name=diff::$DIFF"
-          echo "::set-output name=rank_src::$RANK_SRC"
-          echo "::set-output name=rank_tests::$RANK_TESTS"
+          echo "::set-output name=rank_log::$RANK_LOG"
+          echo "::set-output name=rank_producer::$RANK_PRODUCER"
 
       - name: Find current PR
         uses: jwalton/gh-find-current-pr@v1
@@ -64,12 +64,11 @@ jobs:
           message: |
             ```
             ${{ steps.wily.outputs.diff }}
-            ${{ steps.wily.outputs.rank_src }}
-            ${{ steps.wily.outputs.rank_tests }}
+            ${{ steps.wily.outputs.rank_log }}
+            ${{ steps.wily.outputs.rank_producer }}
             ```
       - name: Add Wily PR Comment
-        uses: marocchino/sticky-pull-
-        request-comment@v2
+        uses: marocchino/sticky-pull-request-comment@v2
         if: steps.findPr.outputs.number && steps.wily.outputs.diff == ''
         with:
           recreate: true

@@ -39,7 +39,7 @@ setup-wily:
 .PHONY: wily-operators-src
 wily-operators-src:
 	poetry run wily rank src/ --asc --threshold=80
-	poetry run wily report src/deiteo_kafka/log.py --console-format html
+	poetry run wily report src/deiteo_kafka/log.py
 	poetry run wily report src/deiteo_kafka/producer/deiteo_kafka_aio_producer.py
 
 .PHONY: wily-operators-tests
