@@ -38,7 +38,6 @@ runs:
 
     - name: Trivy Scan Result
       uses: marocchino/sticky-pull-request-comment@v2
-      if: steps.findPr.outputs.number && steps.wily.outputs.diff == ''
       with:
         recreate: true
         number: ${{ steps.trivyScan.outputs.number }}
