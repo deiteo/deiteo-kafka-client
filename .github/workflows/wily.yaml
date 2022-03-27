@@ -27,8 +27,8 @@ jobs:
         run: |
           wily build src/ tests/
           DIFF=$(wily diff src/ tests/ --no-detail -r origin/${{ github.event.pull_request.base.ref }})
-          RANK_SRC=$(wily rank src/ --asc --threshold=80)
-          RANK_TESTS=$(wily rank tests/ --asc --threshold=80)
+          RANK_SRC=$(wily report src/)
+          RANK_TESTS=$(wily report tests/)
 
           echo "$DIFF"
           echo "$RANK_SRC"
@@ -68,7 +68,8 @@ jobs:
             ${{ steps.wily.outputs.rank_tests }}
             ```
       - name: Add Wily PR Comment
-        uses: marocchino/sticky-pull-request-comment@v2
+        uses: marocchino/sticky-pull-
+        request-comment@v2
         if: steps.findPr.outputs.number && steps.wily.outputs.diff == ''
         with:
           recreate: true
