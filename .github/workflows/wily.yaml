@@ -26,7 +26,7 @@ jobs:
         id: wily
         run: |
           wily build src/ tests/
-          DIFF=$(wily diff src/ tests/ --no-detail)
+          DIFF=$(wily diff src/ tests/ --no-detail -r origin/${{ github.event.pull_request.base.ref }})
 
           echo "$DIFF"
           # Build multine output
