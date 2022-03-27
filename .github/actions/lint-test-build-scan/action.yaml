@@ -1,5 +1,3 @@
-import("fmt")
-
 name: 'Lint Dockerfile, Build Image, Test & Trivy Scan'
 description: 'Github action to Lint, Test & Build Image'
 inputs:
@@ -10,6 +8,10 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - name: Find current PR
+      uses: jwalton/gh-find-current-pr@v1
+      id: findPr
+
     - name: Lint Dockerfile
       id: LintDockerfile
       uses: hadolint/hadolint-action@master
@@ -26,6 +28,16 @@ runs:
         LINTER_OUTPUT="$(make run-container-linter APP=${{ inputs.app }} TAG=${{ inputs.tag }})"
         echo "::set-output name=linter::$LINTER_OUTPUT"
       shell: sh
+
+    - name: Run linter Message
+      uses: marocchino/sticky-pull-request-comment@v2
+      with:
+        recreate: true
+        number: ${{ steps.findPr.number }}
+        message: |
+          ```
+          ${{ steps.RunLinter.outputs.linter }}
+          ```
 
     - name: Unit Tests & Coverage
       id: UnitTestsAndCoverage
