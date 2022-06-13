@@ -1,3 +1,4 @@
+import json
 import logging
 from asyncio import AbstractEventLoop, get_event_loop
 from datetime import datetime
@@ -60,8 +61,9 @@ class DeiteoKafkaAioProducer:
                 self._add_ingestion_ts(topic_content=topic_content)
 
             elif isinstance(topic_content, str):
-                topic_content = {"data": topic_content}
+                topic_content = {"data": json.loads(topic_content)}
                 self._add_ingestion_ts(topic_content=topic_content)
+                topic_content = json.dumps(topic_content)
 
             await self.producer.send_and_wait(
                 self.topic,
